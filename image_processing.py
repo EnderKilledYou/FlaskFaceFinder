@@ -61,7 +61,7 @@ def remove_background():
     db.session.add(new_image)
     db.session.commit()
     db.session.flush()
-    return return_as_json(new_image)
+    return return_as_json(new_image.to_dict())
 
 @image_processing.route('/extract_faces', methods=['POST'])
 @login_required
