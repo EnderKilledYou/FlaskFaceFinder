@@ -16,3 +16,20 @@ imgaug
 pytest
 flask_expects_json
 SQLAlchemy-serializer
+aiohttp==3.8.1
+asyncer==0.0.1
+click==8.0.3
+fastapi==0.72.0
+filetype==1.0.9
+gdown==4.4.0
+numpy==1.21.5
+onnxruntime==1.10.0
+pillow==9.0.1
+pymatting==1.1.5
+python-multipart==0.0.5
+
+tqdm==4.62.3
+uvicorn==0.17.0
+
+#if you have a gpu enabled processor uncomment the next line and comment the above line
+#rembg[gpu]

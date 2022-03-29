@@ -8,10 +8,10 @@ from helpers import return_as_json
 from orm import User
 from app import db, app
 import logging
-
-auth = Blueprint('auth', __name__)
 logging.basicConfig(filename='auth.log', level=logging.DEBUG,
                     format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
+
+auth = Blueprint('auth', __name__)
 
 
 @auth.route('/login', methods=['POST'])

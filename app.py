@@ -9,6 +9,7 @@ db = SQLAlchemy(app)
 
 from auth import auth as auth_blueprint
 from main import main as main_blueprint
+from image_processing import image_processing as image_processing_blueprint
 from orm import User, UserImage
 
 from images import images as images_blueprint
@@ -16,6 +17,7 @@ from images import images as images_blueprint
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(main_blueprint)
 app.register_blueprint(images_blueprint)
+app.register_blueprint(image_processing_blueprint)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -30,4 +32,4 @@ def load_user(user_id):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(allow_extra_args=True)

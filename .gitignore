@@ -2,7 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+face.sqlite3
+auth.log
+logs/
+./pretrain_models
 # C extensions
 *.so
 ./idea

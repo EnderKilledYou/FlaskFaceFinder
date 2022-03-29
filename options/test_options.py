@@ -22,6 +22,13 @@ class TestOptions(BaseOptions):
         parser.add_argument('--num_test', type=int, default=50, help='how many test images to run')
         parser.add_argument('--parse_net_weight', type=str, default='./pretrain_models/parse_multi_iter_90000.pth', help='parse model path')
         parser.add_argument('--psfr_net_weight', type=str, default='./pretrain_models/psfrgan_epoch15_net_G.pth', help='parse model path')
+        parser.add_argument('--module',type=str,default='')
+        parser.add_argument('--multiproc', type=str, default='')
+        parser.add_argument('--qt-support', type=str, default='auto')
+        parser.add_argument('--client', type=str, default='127.0.0.1')
+        parser.add_argument('--port', type=str, default='39371')
+        parser.add_argument('--file', type=str, default='flask')
+        parser.add_argument('run', type=str, default='' )
         # rewrite devalue values
         # To avoid cropping, the load_size should be the same as crop_size
         parser.set_defaults(load_size=parser.get_default('crop_size'))

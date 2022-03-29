@@ -1,6 +1,8 @@
 import base64
+import io
+import logging
 
-from flask import Blueprint, request, abort, Response
+from flask import Blueprint, request, abort, Response, send_file
 from flask_login import login_required, current_user
 
 from app import db
@@ -10,6 +12,7 @@ from orm import UserImage
 from flask_expects_json import expects_json
 
 images = Blueprint('images', __name__)
+
 
 
 @images.route('/upload_image', methods=['POST'])
@@ -29,8 +32,23 @@ def upload_image():
 def get_image():
     user_image = UserImage.query.filter_by(id=request.json['image_id'], user_id=current_user.id).first()
     if user_image is None:
-        abort(400,Response("No such image"))
+        abort(400, Response("No such image"))
     return return_as_json(user_image.to_dict())
+
+
+@images.route('/get_image_view/<id>', methods=['GET'])
+
+def get_image_view(id):
+    # , user_id=current_user.id
+    user_image = UserImage.query.filter_by(id=id).first()
+    if user_image is None:
+        abort(400, Response("No such image"))
+    
+    img_bytes = base64.b64decode(user_image.data)
+    img = io.BytesIO()
+    img.write(img_bytes)
+    img.seek(0)
+    return send_file(img, mimetype='image/png')
 
 
 @images.route('/get_images', methods=['GET'])
