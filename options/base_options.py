@@ -2,6 +2,8 @@ import argparse
 import os
 import numpy as np
 import random
+
+from PSFRGAN_config import config
 from utils import utils
 import torch
 import models
@@ -24,43 +26,60 @@ class BaseOptions():
         """Define the common options that are used in both training and test."""
         # basic parameters
         parser.add_argument('--dataroot', required=False, help='path to images')
-        parser.add_argument('--name', type=str, default='experiment_name', help='name of the experiment. It decides where to store samples and models')
-        parser.add_argument('--gpus', type=int, default=1, help='how many gpus to use')
-        parser.add_argument('--seed', type=int, default=123, help='Random seed for training')
-        parser.add_argument('--checkpoints_dir', type=str, default='./check_points', help='models are saved here')
+        parser.add_argument('--name', type=str, default='experiment_name',
+                            help='name of the experiment. It decides where to store samples and models')
+        parser.add_argument('--gpus', type=int, default=config['gpus'], help='how many gpus to use')
+        parser.add_argument('--seed', type=int, default=config['seed'], help='Random seed for training')
+        parser.add_argument('--checkpoints_dir', type=str, default=config['checkpoints_dir'],
+                            help='models are saved here')
         # model parameters
-        parser.add_argument('--model', type=str, default='enhance', help='chooses which model to train [parse|enhance]')
-        parser.add_argument('--input_nc', type=int, default=3, help='# of input image channels: 3 for RGB and 1 for grayscale')
-        parser.add_argument('--Dinput_nc', type=int, default=3, help='# of input image channels: 3 for RGB and 1 for grayscale')
-        parser.add_argument('--output_nc', type=int, default=3, help='# of output image channels: 3 for RGB and 1 for grayscale')
-        parser.add_argument('--ngf', type=int, default=64, help='# of gen filters in the last conv layer')
-        parser.add_argument('--ndf', type=int, default=64, help='# of discrim filters in the first conv layer')
-        parser.add_argument('--n_layers_D', type=int, default=4, help='downsampling layers in discriminator')
-        parser.add_argument('--D_num', type=int, default=3, help='numbers of discriminators')
+        parser.add_argument('--model', type=str, default=config['model'],
+                            help='chooses which model to train [parse|enhance]')
+        parser.add_argument('--input_nc', type=int, default=config['input_nc'],
+                            help='# of input image channels: 3 for RGB and 1 for grayscale')
+        parser.add_argument('--Dinput_nc', type=int, default=config['Dinput_nc'],
+                            help='# of input image channels: 3 for RGB and 1 for grayscale')
+        parser.add_argument('--output_nc', type=int, default=config['output_nc'],
+                            help='# of output image channels: 3 for RGB and 1 for grayscale')
+        parser.add_argument('--ngf', type=int, default=config['ngf'], help='# of gen filters in the last conv layer')
+        parser.add_argument('--ndf', type=int, default=config['ndf'],
+                            help='# of discrim filters in the first conv layer')
+        parser.add_argument('--n_layers_D', type=int, default=config['n_layers_D'],
+                            help='downsampling layers in discriminator')
+        parser.add_argument('--D_num', type=int, default=config['D_num'], help='numbers of discriminators')
 
-        parser.add_argument('--Pnorm', type=str, default='bn', help='parsing net norm [in | bn| none]')
-        parser.add_argument('--Gnorm', type=str, default='spade', help='generator norm [in | bn | none]')
-        parser.add_argument('--Dnorm', type=str, default='in', help='discriminator norm [in | bn | none]')
-        parser.add_argument('--init_type', type=str, default='normal', help='network initialization [normal | xavier | kaiming | orthogonal]')
-        parser.add_argument('--init_gain', type=float, default=0.02, help='scaling factor for normal, xavier and orthogonal.')
+        parser.add_argument('--Pnorm', type=str, default=config['Pnorm'], help='parsing net norm [in | bn| none]')
+        parser.add_argument('--Gnorm', type=str, default=config['Gnorm'], help='generator norm [in | bn | none]')
+        parser.add_argument('--Dnorm', type=str, default=config['Dnorm'], help='discriminator norm [in | bn | none]')
+        parser.add_argument('--init_type', type=str, default=config['init_type'],
+                            help='network initialization [normal | xavier | kaiming | orthogonal]')
+        parser.add_argument('--init_gain', type=float, default=config['init_gain'],
+                            help='scaling factor for normal, xavier and orthogonal.')
         # dataset parameters
-        parser.add_argument('--dataset_name', type=str, default='single', help='dataset name')
-        parser.add_argument('--Pimg_size', type=int, default='512', help='image size for face parse net')
-        parser.add_argument('--Gin_size', type=int, default='512', help='image size for face parse net')
-        parser.add_argument('--Gout_size', type=int, default='512', help='image size for face parse net')
-        parser.add_argument('--serial_batches', action='store_true', help='if true, takes images in order to make batches, otherwise takes them randomly')
-        parser.add_argument('--num_threads', default=8, type=int, help='# threads for loading data')
-        parser.add_argument('--batch_size', type=int, default=16, help='input batch size')
-        parser.add_argument('--load_size', type=int, default=512, help='scale images to this size')
-        parser.add_argument('--crop_size', type=int, default=256, help='then crop to this size')
-        parser.add_argument('--max_dataset_size', type=int, default=float("inf"), help='Maximum number of samples allowed per dataset. If the dataset directory contains more than max_dataset_size, only a subset is loaded.')
-        parser.add_argument('--preprocess', type=str, default='none', help='scaling and cropping of images at load time [resize_and_crop | crop | scale_width | scale_width_and_crop | none]')
-        parser.add_argument('--no_flip', action='store_true', help='if specified, do not flip the images for data augmentation')
+        parser.add_argument('--dataset_name', type=str, default=config['dataset_name'], help='dataset name')
+        parser.add_argument('--Pimg_size', type=int, default=config['Pimg_size'], help='image size for face parse net')
+        parser.add_argument('--Gin_size', type=int, default=config['Gin_size'], help='image size for face parse net')
+        parser.add_argument('--Gout_size', type=int, default=config['Gout_size'], help='image size for face parse net')
+        parser.add_argument('--serial_batches', action='store_true',
+                            help='if true, takes images in order to make batches, otherwise takes them randomly')
+        parser.add_argument('--num_threads', default=config['num_threads'], type=int, help='# threads for loading data')
+        parser.add_argument('--batch_size', type=int, default=config['batch_size'], help='input batch size')
+        parser.add_argument('--load_size', type=int, default=config['load_size'], help='scale images to this size')
+        parser.add_argument('--crop_size', type=int, default=config['crop_size'], help='then crop to this size')
+        parser.add_argument('--max_dataset_size', type=int, default=config['max_dataset_size'],
+                            help='Maximum number of samples allowed per dataset. If the dataset directory contains more than max_dataset_size, only a subset is loaded.')
+        parser.add_argument('--preprocess', type=str, default=config['preprocess'],
+                            help='scaling and cropping of images at load time [resize_and_crop | crop | scale_width | scale_width_and_crop | none]')
+        parser.add_argument('--no_flip', action='store_true',
+                            help='if specified, do not flip the images for data augmentation')
         # additional parameters
-        parser.add_argument('--epoch', type=str, default='latest', help='which epoch to load? set to latest to use latest cached model')
-        parser.add_argument('--load_iter', type=int, default='0', help='which iteration to load? if load_iter > 0, the code will load models by iter_[load_iter]; otherwise, the code will load models by [epoch]')
+        parser.add_argument('--epoch', type=str, default=config['epoch'],
+                            help='which epoch to load? set to latest to use latest cached model')
+        parser.add_argument('--load_iter', type=int, default=config['load_iter'],
+                            help='which iteration to load? if load_iter > 0, the code will load models by iter_[load_iter]; otherwise, the code will load models by [epoch]')
         parser.add_argument('--verbose', action='store_true', help='if specified, print more debugging information')
-        parser.add_argument('--suffix', default='', type=str, help='customized suffix: opt.name = opt.name + suffix: e.g., {model}_{netG}_size{load_size}')
+        parser.add_argument('--suffix', default=config['suffix'], type=str,
+                            help='customized suffix: opt.name = opt.name + suffix: e.g., {model}_{netG}_size{load_size}')
 
         parser.add_argument('--debug', action='store_true', help='if specified, set to debug mode')
         self.initialized = True
@@ -127,7 +146,7 @@ class BaseOptions():
     def parse(self):
         """Parse our options, create checkpoints directory suffix, and set up gpu device."""
         opt = self.gather_options()
-        opt.isTrain = self.isTrain   # train or test
+        opt.isTrain = self.isTrain  # train or test
 
         if opt.debug:
             opt.name = 'debug'
