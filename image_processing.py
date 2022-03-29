@@ -6,8 +6,8 @@ from PIL import Image
 from flask import Blueprint, request, abort, Response
 from flask_login import login_required, current_user
 
-from app import db
-from helpers import return_as_json, return_as_json_list
+from app import db, app
+from helpers import return_as_json, return_as_json_list, list_to_dict
 from image_processing_schemas import extract_faces_schema, remove_background_schema
 from orm import UserImage
 
@@ -61,41 +61,67 @@ def remove_background():
     db.session.add(new_image)
     db.session.commit()
     db.session.flush()
-    return return_as_json(new_image)
+    return return_as_json(new_image.to_dict())
 
 @image_processing.route('/extract_faces', methods=['POST'])
 @login_required
 @expects_json(extract_faces_schema)
 def extract_faces():
-    user_image = UserImage.query.filter_by(id=request.json['image_id'], user_id=current_user.id).first()
+    current_user_id = current_user.id
+    user_image = UserImage.query.filter_by(id=request.json['image_id'], user_id=current_user_id).first()
     if user_image is None:
         abort(400, Response("No such image"))
     root_id = user_image.root_id
+    user_image_id = user_image.id
     if user_image.root_id == 0:
-        root_id = user_image.id  # make sure we have the right root id
+        root_id = user_image_id  # make sure we have the right root id
 
+    img = get_image_as_dlib(user_image)
+
+    aligned_faces, tform_params = detect_and_align_faces(img, face_detector, lmk_predictor, template_path)
+    if len(aligned_faces) == 0:
+        return return_as_json({'faces': list_to_dict([]), 'enhanced': None})
+
+    hq_faces, lq_parse_maps = enhance_faces(aligned_faces, enhance_model)
+    hq_images = []
+    try:
+        for hq_img in hq_faces:
+            new_image = create_image_from_array(current_user_id, hq_img, root_id, user_image_id)
+            db.session.add(new_image)
+            hq_images.append(new_image)
+    except BaseException as e:
+        app.logger.error(e)
+        return Response("Check the logs", status=500)
+
+    try:
+        hq_img = past_faces_back(img, hq_faces, tform_params, upscale=opt.test_upscale)
+        new_image = create_image_from_array(current_user_id, hq_img, root_id, user_image_id)
+        db.session.add(new_image)
+    except BaseException as e:
+        app.logger.error(e)
+        return Response("Check the logs", status=500)
+
+    db.session.commit()
+    db.session.flush()
+
+    return return_as_json({'faces': list_to_dict(hq_images), 'enhanced': new_image.to_dict()})
+
+
+def get_image_as_dlib(user_image):
     with tempfile.NamedTemporaryFile(delete=False) as tmp:
         encoded_image = user_image.data.encode('utf-8')
         img_bytes = base64.b64decode(encoded_image)
         tmp.write(img_bytes)
     img = dlib.load_rgb_image(tmp.name)
     os.remove(tmp.name)
-    aligned_faces, tform_params = detect_and_align_faces(img, face_detector, lmk_predictor, template_path)
-    if len(aligned_faces) == 0:
-        return return_as_json({'faces': []})
+    return img
 
-    hq_faces, lq_parse_maps = enhance_faces(aligned_faces, enhance_model)
-    hq_images = []
 
-    for hq_face in hq_faces:
-        image_data_np = Image.fromarray(hq_face)
-        buffered = BytesIO()
-        image_data_np.save(buffered, format="PNG")
-        image_data = base64.b64encode(buffered.getvalue())
-        new_image = UserImage(parent_id=user_image.id, user_id=current_user.id, data=image_data,
-                              root_id=root_id)
-        db.session.add(new_image)
-        hq_images.append(new_image)
-    db.session.commit()
-    db.session.flush()
-    return return_as_json_list(hq_images)
+def create_image_from_array(current_user_id, hq_img, root_id, user_image_id):
+    image_data_np = Image.fromarray(hq_img)
+    buffered = BytesIO()
+    image_data_np.save(buffered, format="PNG")
+    image_data = base64.b64encode(buffered.getvalue())
+    new_image = UserImage(parent_id=user_image_id, user_id=current_user_id, data=image_data,
+                          root_id=root_id)
+    return new_image

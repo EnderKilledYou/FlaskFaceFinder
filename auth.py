@@ -8,7 +8,7 @@ from helpers import return_as_json
 from orm import User
 from app import db, app
 import logging
-logging.basicConfig(filename='auth.log', level=logging.DEBUG,
+logging.basicConfig(filename='error.log', level=logging.DEBUG,
                     format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
 
 auth = Blueprint('auth', __name__)
