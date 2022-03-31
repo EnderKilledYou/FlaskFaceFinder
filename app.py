@@ -8,7 +8,7 @@ app.config['SECRET_KEY'] = 'E315277807427FFC1CAF0B1040CEC8E84BE32F482377A42290AA
 db = SQLAlchemy(app)
 
 
-def lazy_init:
+def lazy_init():
     from auth import auth as auth_blueprint
     from main import main as main_blueprint
     from image_processing import image_processing as image_processing_blueprint
