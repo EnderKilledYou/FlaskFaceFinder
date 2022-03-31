@@ -32,4 +32,4 @@ tqdm==4.62.3
 uvicorn==0.17.0
 
 #if you have a gpu enabled processor uncomment the next line and comment the above line
-#rembg[gpu]
+onnxruntime-gpu==1.10.0
