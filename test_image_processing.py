@@ -63,5 +63,6 @@ def test_extract_faces():
                             data=json.dumps({'image_id': data2['id']}),
                             content_type='application/json', )
     data3 = response3.json
-    print(data3[0]['id'])
-    assert len(data3) == 3
+    assert response3.status_code == 200
+    assert len(data3['faces']) == 3
+
