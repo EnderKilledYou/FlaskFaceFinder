@@ -11,21 +11,8 @@ from helpers import return_as_json, return_as_json_list, list_to_dict
 from image_processing_schemas import extract_faces_schema, remove_background_schema
 from orm import UserImage
 
-'''
-   This script enhance images with unaligned faces in a folder and paste it back to the original place.
-   '''
-import dlib
-import os
-import cv2
-import numpy as np
-from tqdm import tqdm
-from skimage import transform as trans
-from skimage import io
 from flask_expects_json import expects_json
-import torch
-from utils import utils
-from options.test_options import TestOptions
-from models import create_model
+
 
 from test_enhance_single_unalign import *
 
@@ -41,6 +28,7 @@ opt = TestOptions().parse()
 opt.gpus = 0
 enhance_model = def_models(opt)
 print("Face Req Loaded... ")
+
 
 
 @image_processing.route('/remove_background', methods=['POST'])
