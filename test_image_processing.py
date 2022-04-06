@@ -24,15 +24,12 @@ def test_remove_background():
 
     assert response2.status_code == 200
 
-    response3 = client.post('/extract_faces',
-                            data=json.dumps({'image_id': data2['id']}),
-                            content_type='application/json', )
+    response3 = client.get('/extract_faces/' + str(data2['id'])                           )
     data3 = response3.json
-    print(data3[0]['id'])
-    assert len(data3) == 3
+    assert len(data3['faces']) == 3
+    print(data3['faces'][0]['id'])
 
-    response4 = client.post('/remove_background', data=json.dumps({'image_id': data3[0]['id']}),
-                            content_type='application/json',)
+    response4 = client.get('/remove_background/'+ str(data3['faces'][0]['id']))
 
     assert response4.status_code == 200
     data4 = response4.json
@@ -59,9 +56,7 @@ def test_extract_faces():
 
     assert response2.status_code == 200
 
-    response3 = client.post('/extract_faces',
-                            data=json.dumps({'image_id': data2['id']}),
-                            content_type='application/json', )
+    response3 = client.get('/extract_faces/' + str(data2['id']))
     data3 = response3.json
     assert response3.status_code == 200
     assert len(data3['faces']) == 3

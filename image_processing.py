@@ -11,21 +11,8 @@ from helpers import return_as_json, return_as_json_list, list_to_dict
 from image_processing_schemas import extract_faces_schema, remove_background_schema
 from orm import UserImage
 
-'''
-   This script enhance images with unaligned faces in a folder and paste it back to the original place.
-   '''
-import dlib
-import os
-import cv2
-import numpy as np
-from tqdm import tqdm
-from skimage import transform as trans
-from skimage import io
 from flask_expects_json import expects_json
-import torch
-from utils import utils
-from options.test_options import TestOptions
-from models import create_model
+
 
 from test_enhance_single_unalign import *
 
@@ -43,11 +30,11 @@ enhance_model = def_models(opt)
 print("Face Req Loaded... ")
 
 
-@image_processing.route('/remove_background', methods=['POST'])
+
+@image_processing.route('/remove_background/<image_id>', methods=['GET'])
 @login_required
-@expects_json(remove_background_schema)
-def remove_background():
-    user_image = UserImage.query.filter_by(id=request.json['image_id'], user_id=current_user.id).first()
+def remove_background(image_id):
+    user_image = UserImage.query.filter_by(id=image_id, user_id=current_user.id).first()
     if user_image is None:
         abort(400, Response("No such image"))
     root_id = user_image.root_id
@@ -63,12 +50,11 @@ def remove_background():
     db.session.flush()
     return return_as_json(new_image.to_dict())
 
-@image_processing.route('/extract_faces', methods=['POST'])
+@image_processing.route('/extract_faces/<image_id>', methods=['GET'])
 @login_required
-@expects_json(extract_faces_schema)
-def extract_faces():
+def extract_faces(image_id):
     current_user_id = current_user.id
-    user_image = UserImage.query.filter_by(id=request.json['image_id'], user_id=current_user_id).first()
+    user_image = UserImage.query.filter_by(id=image_id, user_id=current_user_id).first()
     if user_image is None:
         abort(400, Response("No such image"))
     root_id = user_image.root_id
