@@ -30,7 +30,7 @@ import itertools
 import threading
 import collections
 
-options = {}
+
 
 # Configure all options first so we can later custom-load other libraries (Theano) based on device specified by user.
 parser = argparse.ArgumentParser(description='Generate a new image by applying style onto a content image.',
@@ -72,7 +72,7 @@ add_arg('--generator-start',    default=0, type=int,                help='Epoch 
 add_arg('--discriminator-start',default=1, type=int,                help='Epoch count to update the discriminator.')
 add_arg('--adversarial-start',  default=2, type=int,                help='Epoch for generator to use discriminator.')
 add_arg('--device',             default='cpu', type=str,            help='Name of the CPU/GPU to use, for Theano.')
-args = parser.parse_known_args(options)
+args = parser.parse_args()
 
 
 #----------------------------------------------------------------------------------------------------------------------
