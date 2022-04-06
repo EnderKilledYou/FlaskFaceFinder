@@ -14,7 +14,6 @@ from flask_expects_json import expects_json
 images = Blueprint('images', __name__)
 
 
-
 @images.route('/upload_image', methods=['POST'])
 @login_required
 @expects_json(image_upload_schema)
@@ -26,24 +25,34 @@ def upload_image():
     return return_as_json(new_image.to_dict())
 
 
-@images.route('/get_image', methods=['POST'])
+@images.route('/get_image/<image_id>', methods=['GET'])
 @login_required
-@expects_json(get_image_schema)
-def get_image():
-    user_image = UserImage.query.filter_by(id=request.json['image_id'], user_id=current_user.id).first()
+def get_image(image_id):
+    user_image = UserImage.query.filter_by(id=image_id, user_id=current_user.id).first()
     if user_image is None:
         abort(400, Response("No such image"))
     return return_as_json(user_image.to_dict())
 
 
-@images.route('/get_image_view/<id>', methods=['GET'])
+@images.route('/delete_image/<image_id>', methods=['GET'])
+@login_required
+def delete_image(image_id):
+    user_image: UserImage = UserImage.query.filter_by(id=image_id, user_id=current_user.id).first()
+    if user_image is None:
+        abort(400, Response("No such image"))
+    db.session.delete(user_image);
+    db.session.commit()
+    db.session.flush()
+    return return_as_json({})
 
+
+@images.route('/get_image_view/<id>', methods=['GET'])
 def get_image_view(id):
     # , user_id=current_user.id
     user_image = UserImage.query.filter_by(id=id).first()
     if user_image is None:
         abort(400, Response("No such image"))
-    
+
     img_bytes = base64.b64decode(user_image.data)
     img = io.BytesIO()
     img.write(img_bytes)
@@ -55,4 +64,17 @@ def get_image_view(id):
 @login_required
 def get_images():
     user_images = UserImage.query.filter_by(user_id=current_user.id).all()
+    return return_as_json_list(user_images)
+
+@images.route('/get_images/<root_id>', methods=['GET'])
+@login_required
+def get_root_images(root_id):
+    user_images = UserImage.query.filter_by(user_id=current_user.id,root_id=root_id).all()
+    return return_as_json_list(user_images)
+
+
+@images.route('/get_images_by_parent/<parent_id>', methods=['GET'])
+@login_required
+def get_images_by_parent(parent_id):
+    user_images = UserImage.query.filter_by(user_id=current_user.id,parent_id=parent_id).all()
     return return_as_json_list(user_images)

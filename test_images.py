@@ -45,9 +45,7 @@ def test_image_get():
     data2 = response2.json
 
     image_query = json.dumps({'image_id': data2['id']})
-    response3 = client.post('/get_image',
-                            data=image_query,
-                            content_type='application/json')
+    response3 = client.get('/get_image/' + str(data2['id']))
     data3 = response3.json
 
     assert data3['data'] == base64_content
