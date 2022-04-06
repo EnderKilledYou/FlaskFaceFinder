@@ -18,19 +18,19 @@ flask_expects_json
 SQLAlchemy-serializer
 aiohttp==3.8.1
 asyncer==0.0.1
-click==8.0.3
-filetype==1.0.9
+click==8.1.2
+filetype==1.0.10
 gdown==4.4.0
 numpy==1.21.5
-onnxruntime==1.10.0
-pillow==9.0.1
+onnxruntime==1.11.0
+pillow==9.1.0
 pymatting==1.1.5
 python-multipart==0.0.5
-tqdm==4.62.3
-uvicorn==0.17.0
+
+uvicorn==0.17.6
 #if you have a gpu enabled processor uncomment the next line and comment the above line
 #onnxruntime-gpu==1.10.0
 colorama
 pillow>=3.2.0
-Theano==0.8.2
+Theano==1.0.5
 git+https://github.com/Lasagne/Lasagne.git@61b1ad1#egg=Lasagne==0.2-dev
