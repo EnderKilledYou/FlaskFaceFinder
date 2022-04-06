@@ -31,11 +31,10 @@ print("Face Req Loaded... ")
 
 
 
-@image_processing.route('/remove_background', methods=['POST'])
+@image_processing.route('/remove_background/<image_id>', methods=['GET'])
 @login_required
-@expects_json(remove_background_schema)
-def remove_background():
-    user_image = UserImage.query.filter_by(id=request.json['image_id'], user_id=current_user.id).first()
+def remove_background(image_id):
+    user_image = UserImage.query.filter_by(id=image_id, user_id=current_user.id).first()
     if user_image is None:
         abort(400, Response("No such image"))
     root_id = user_image.root_id
@@ -51,12 +50,11 @@ def remove_background():
     db.session.flush()
     return return_as_json(new_image.to_dict())
 
-@image_processing.route('/extract_faces', methods=['POST'])
+@image_processing.route('/extract_faces/<image_id>', methods=['GET'])
 @login_required
-@expects_json(extract_faces_schema)
-def extract_faces():
+def extract_faces(image_id):
     current_user_id = current_user.id
-    user_image = UserImage.query.filter_by(id=request.json['image_id'], user_id=current_user_id).first()
+    user_image = UserImage.query.filter_by(id=image_id, user_id=current_user_id).first()
     if user_image is None:
         abort(400, Response("No such image"))
     root_id = user_image.root_id
