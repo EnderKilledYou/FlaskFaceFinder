@@ -22,13 +22,14 @@ click==8.1.2
 filetype==1.0.10
 gdown==4.4.0
 numpy==1.21.5
-onnxruntime==1.11.0
+
 pillow==9.1.0
 pymatting==1.1.5
 python-multipart==0.0.5
 uvicorn==0.17.6
+onnxruntime==1.11.0
 #if you have a gpu enabled processor uncomment the next line and comment the above line
-onnxruntime-gpu
+#onnxruntime-gpu
 colorama
 Theano==1.0.5
 
