@@ -16,21 +16,15 @@ def neural_enhance(id):
     user_image = UserImage.query.filter_by(id=id, user_id=current_user.id).first()
     if user_image is None:
         abort(400, Response("No such image"))
-    root_id = user_image.root_id
-    if user_image.root_id == 0:
-        root_id = user_image.id
+
     try:
-        image_data = image_neural_enhance(user_image)
+        new_image = image_neural_enhance(user_image)
 
     except BaseException as fk:
         app.logger.error(fk)
-        abort(500,Response('There was an error check the logs'))
+        abort(500, Response('There was an error check the logs'))
 
-    new_image = UserImage(parent_id=user_image.parent_id, user_id=current_user.id, data=image_data,
-                          root_id=root_id)
     db.session.add(new_image)
     db.session.commit()
     db.session.flush()
     return return_as_json(new_image.to_dict())
-
-
