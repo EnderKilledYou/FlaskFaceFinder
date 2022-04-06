@@ -3,7 +3,7 @@ import json
 from app import app
 
 
-def test_remove_background():
+def test_enhances():
     client = app.test_client()
     with open("testimage.base64", "r") as data_file:
         base64_content = data_file.read()
