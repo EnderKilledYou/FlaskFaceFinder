@@ -33,4 +33,4 @@ uvicorn==0.17.6
 colorama
 pillow>=3.2.0
 Theano==1.0.5
-git+https://github.com/Lasagne/Lasagne.git@61b1ad1#egg=Lasagne==0.2-dev
+

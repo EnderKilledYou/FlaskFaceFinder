@@ -33,6 +33,8 @@ import collections
 
 
 # Configure all options first so we can later custom-load other libraries (Theano) based on device specified by user.
+from scishim import toimage
+
 parser = argparse.ArgumentParser(description='Generate a new image by applying style onto a content image.',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 add_arg = parser.add_argument
@@ -468,7 +470,7 @@ class NeuralEnhancer(object):
         print('{}'.format(ansi.ENDC))
 
     def imsave(self, fn, img):
-        scipy.misc.toimage(np.transpose(img + 0.5, (1, 2, 0)).clip(0.0, 1.0) * 255.0, cmin=0, cmax=255).save(fn)
+        toimage(np.transpose(img + 0.5, (1, 2, 0)).clip(0.0, 1.0) * 255.0, cmin=0, cmax=255).save(fn)
 
     def show_progress(self, orign, scald, repro):
         os.makedirs('valid', exist_ok=True)
@@ -569,20 +571,6 @@ class NeuralEnhancer(object):
             for i in range(3):
                 output[:,:,i] = self.match_histograms(output[:,:,i], original[:,:,i])
 
-        return scipy.misc.toimage(output, cmin=0, cmax=255)
+        return toimage(output, cmin=0, cmax=255)
 
 
-if __name__ == "__main__":
-    if args.train:
-        args.zoom = 2**(args.generator_upscale - args.generator_downscale)
-        enhancer = NeuralEnhancer(loader=True)
-        enhancer.train()
-    else:
-        enhancer = NeuralEnhancer(loader=False)
-        for filename in args.files:
-            print(filename, end=' ')
-            img = scipy.ndimage.imread(filename, mode='RGB')
-            out = enhancer.process(img)
-            out.save(os.path.splitext(filename)[0]+'_ne%ix.png' % args.zoom)
-            print(flush=True)
-        print(ansi.ENDC)

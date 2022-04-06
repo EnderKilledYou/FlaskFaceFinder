@@ -5,7 +5,8 @@ __pycache__/
 face.sqlite3
 auth.log
 logs/
-./pretrain_models
+ne2x-photo-default-0.3.pkl.bz2
+./pretrain_models0
 # C extensions
 *.so
 ./idea

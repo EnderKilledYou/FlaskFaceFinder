@@ -17,8 +17,13 @@ def test_enhances():
 
     assert response.status_code == 200
 
-    response2 = client.get('/neural_enhance/' + data['id'])
-    assert response2.status_code == 200
+    response2 = client.post('/upload_image',
+                            data=upload_data,
+                            content_type='application/json', )
     data2 = response2.json
+
+    response3 = client.get('/neural_enhance/' + str(data2['id']))
+    assert response3.status_code == 200
+    data3 = response3.json
 
 
