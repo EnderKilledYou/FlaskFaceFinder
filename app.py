@@ -34,4 +34,4 @@ def load_user(user_id):
 
 
 if __name__ == '__main__':
-    app.run(allow_extra_args=True)#:~:text=from%20flask%20import,run(allow_extra_args%3DTrue)
+    app.run(allow_extra_args=True)

@@ -19,23 +19,16 @@ enhancer = NeuralEnhancer(loader=False)
 @neural_enhance.route('/neural_enhance/<id>', methods=['GET'])
 @login_required
 def neural_enhancer(id):
-    user_image = UserImage.query.filter_by(id=id, user_id=current_user.id).first()
+    user_image: UserImage = UserImage.query.filter_by(id=id, user_id=current_user.id).first()
     if user_image is None:
         abort(400, Response("No such image"))
-    root_id = user_image.root_id
-    if user_image.root_id == 0:
-        root_id = user_image.id
     try:
-        img_bytes = base64.b64decode(user_image.data)
-        img_mem = io.BytesIO()
-        img_mem.write(img_bytes)
-        img_mem.seek(0)
+
+        img_mem = user_image.to_bytesio()
         img = imageio.imread(img_mem)
         out = enhancer.process(img)
-        buffered = io.BytesIO()
-        out.save(buffered, format="PNG")
-        img_str = base64.b64encode(buffered.getvalue())
-        new_image = UserImage(data=img_str, parent_id=user_image.id, user_id=current_user.id, root_id=root_id)
+        new_image = user_image.read_from_PIL(out)
+
     except BaseException as fk:
         app.logger.error(fk)
         abort(500, Response('There was an error check the logs'))

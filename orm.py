@@ -1,4 +1,5 @@
 import base64
+import io
 import json
 import tempfile
 from dataclasses import dataclass
@@ -31,12 +32,29 @@ class UserImage(db.Model, SerializerMixin):
     user_id = db.Column(db.Integer, index=True)
     data = db.Column(db.Text)
 
+    def to_bytesio(self):
+        img_bytes = base64.b64decode(self.data)
+        img_mem = io.BytesIO()
+        img_mem.write(img_bytes)
+        img_mem.seek(0)
+        return img_mem
+
     def write_to_file(self):
         with tempfile.NamedTemporaryFile(delete=False) as tmp:
             encoded_image = self.data.encode('utf-8')
             img_bytes = base64.b64decode(encoded_image)
             tmp.write(img_bytes)
         return tmp.name
+
+    def read_from_PIL(self, out):
+        root_id = self.root_id
+        if self.root_id == 0:
+            root_id = self.id
+        buffered = io.BytesIO()
+        out.save(buffered, format="PNG")
+        image_data = base64.b64encode(buffered.getvalue())
+        return UserImage(parent_id=self.parent_id, user_id=self.user_id, data=image_data,
+                         root_id=root_id)
 
     @staticmethod
     def read_from_file(file_path, parent_image=None):
