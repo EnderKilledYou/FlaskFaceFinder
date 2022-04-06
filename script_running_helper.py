@@ -19,7 +19,7 @@ def run_python_and_get_image_output(cmd):
 
 
 def image_neural_files(file):
-    return '/path/to/good/python/for/this/lib /path/to/enhance/script.py --type=photo --model=repair --zoom=1' ' ' + file
+    return '/path/to/good/python/for/this/lib /path/to/enhance/script.py --type=photo --model=repair --zoom=1' + file
 
 
 def image_neural_enhance(user_image):
