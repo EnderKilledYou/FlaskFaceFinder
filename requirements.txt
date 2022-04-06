@@ -26,11 +26,9 @@ onnxruntime==1.11.0
 pillow==9.1.0
 pymatting==1.1.5
 python-multipart==0.0.5
-
 uvicorn==0.17.6
 #if you have a gpu enabled processor uncomment the next line and comment the above line
-#onnxruntime-gpu==1.10.0
+onnxruntime-gpu
 colorama
-pillow>=3.2.0
 Theano==1.0.5
 
