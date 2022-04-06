@@ -1,7 +1,7 @@
 from flask import Blueprint, abort, Response
 from flask_login import login_required, current_user
 
-from app import db
+from app import db, app
 from helpers import return_as_json
 from orm import UserImage
 from script_running_helper import image_neural_enhance
@@ -19,7 +19,12 @@ def neural_enhance(id):
     root_id = user_image.root_id
     if user_image.root_id == 0:
         root_id = user_image.id
-    image_data = image_neural_enhance(user_image)
+    try:
+        image_data = image_neural_enhance(user_image)
+
+    except BaseException as fk:
+        app.logger.error(fk)
+        abort(500,Response('There was an error check the logs'))
 
     new_image = UserImage(parent_id=user_image.parent_id, user_id=current_user.id, data=image_data,
                           root_id=root_id)
